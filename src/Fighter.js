@@ -1,13 +1,15 @@
 const MAX_LIFE = 100;
 
-export class Fighter {
-  constructor(name, strength, dexterity, weapon = null, shield = null) {
+class Fighter {
+  constructor(name, strength, dexterity, image, x, y) {
     this.name = name;
     this.strength = strength;
     this.dexterity = dexterity;
+    this.image = image;
     this.life = MAX_LIFE;
-    this.weapon = weapon;
-    this.shield = shield;
+    this.x = x;
+    this.y = y;
+    this.range = 1;
   }
 
   fight(obj) {
@@ -32,5 +34,33 @@ export class Fighter {
     if (this.life > 0)
       console.log(`${this.name} has  ${this.life} health left`);
     else console.log(`${this.name} is dead`);
+  }
+
+  getRange() {
+    return this.range;
+  }
+}
+
+class Hero extends Fighter {
+  constructor(name, strength, dexterity, image, x, y) {
+    super(name, strength, dexterity, image, x, y);
+    this.weapon = null;
+    this.shield = null;
+    this.range = 1;
+  }
+  getRange() {
+    return this.range + this.weapon.range;
+  }
+}
+class Monster extends Fighter {
+  constructor(name, strength, dexterity, image, x, y) {
+    super(name, strength, dexterity, image, x, y);
+  }
+  getDamage() {
+    return this.strength;
+  }
+
+  getDefense() {
+    return this.dexterity;
   }
 }

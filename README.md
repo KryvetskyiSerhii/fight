@@ -1,76 +1,45 @@
-# The labours of Heracles - First of the labours: the Nemean lion
+# Labors of Heracles #3: the birds of Lake Stymphalus
+ 
+Prerequisite: clone this *repository*.
 
-Prerequisite: clone this _repository_.
 
-## Groundwork
+> To begin, let's have a quick look at the code. In this new challenge, we will integrate an HTML interface to improve our game.
+So you will find an *index.html* file and a linked *style.css* file. At the bottom of the *index.html*, you will find the imports of the different *js* files. Please note that the order is important.
+In the *index.html* file, there is almost nothing. The html templates are prepared and injected directly, as the objects are implemented. You can browse them but you do not need to touch them in the process of the workshop. However, you will be ask to consume some of its features.
 
-Heracles must defeat the fierce Nemean lion, known for its impenetrable skin, making it very difficult to hurt. Before starting their quest, every hero should prepare a little:
+> The HTML `Hero` zone is created directly from the *index.js (line 18 to 20)*.
 
-In the empty _src/Fighter.js_ file, create:
+## Heritage
 
-- a constant `MAX_LIFE = 100`: fighters have 100 max life points
+A new challenge awaits our champion, slaying the monstrous birds of Lake Stymphalus. Heracles (and his equipment) as well as three birds are already instantiated in *index.js (Line 3 to 16)*.
 
-- a `Fighter` class with the properties:
-  - name: name of the fighter.
-  - strength: will be used to calculate the damage points during an attack.
-  - dexterity: will be used to calculate the defense points that will limit the damage received.
-  - life: initialized to MAX_LIFE, so they all start with 100 life points.
+> Currently both birds and heroes are instances of the `Fighter` class. However, if they have common properties specific to fighters (name, life, dexterity, strength...) some characteristics differ. For example, only `Hero` will be able to wear equipment (Shield, Weapon...).
 
-There would potentially be plenty of other things to add, but that's a good start!
+> It should therefore not be possible to attribute a sword to a bird, but it is currently possible. To solve this design problem, you have to go through inheritance.
 
-Then, in the supplied _index.js_ file, create two instances of the Fighter class, for:
+- Created two classes `Hero` and `Monster`, each inheriting from `Fighter`. The properties common to both will remain in Fighter, those specific to `Hero` (`Weapon` and `Shield`) will move to `Hero`. The `Monster` class currently only extends `Fighter` without further modification.
+- Moreover, the `getDamage()` and `getDefense()` methods have a different behavior between a monster and a hero. In the first case, only strength and dexterity are taken into account, in the case of the hero, the values ​​returned also take into account the characteristics of weapons and armor. The `getDamage()` and `getDefense()` methods must therefore exist in `Fighter` to reflect the simplest case, and be rewritten in `Hero` to take equipment into account (which normally corresponds to the current code of `Fighter` at the end of the previous workshop).
 
-- 🧔 Heracles, strength 20, dexterity 6
+- In *index.js*, modify the instantiations to take into account its new classes, `Hero` for Heracles and `Monster` for the 3 *birds*. (Line 3, 14, 15, 16)
 
-- 🦁 Nemean Lion, strength 11, dexterity 13
+## Arena
 
-To have a nice look even if you're working in the console, you can add an icon in the name string (https://emojipedia.org/).
-You can also have fun varying the values, but the ones provided will give you relatively balanced fights.
+> Another design change appears with this new event. Here, Heracles no longer fights against a single monster, but against a multitude. Currently, a Fighter doesn't have a way to know all the other Fighters in the fight. It would be possible to create an `adversaries` property in `Fighter`, but each Fighter would have to contain all the others, which would be quite redundant and not allow an easy overview.
 
-> 💡**HINT**: a _constructor_ will be needed in your class to initialize these properties with different values for Heracles and the Lion.
+> A better solution is to create a new class `Arena` which would contain all the `Fighter` as well as methods to manipulate them (make them fight each other, move them around the arena, etc.). In addition, this arena can be used as a support for a map on which to place the `Fighter` and thus add positioning to the gameplay of our game.
 
-> 💡**HINT**: don't forget to _require_ your _Fighter.js_ file if you want to be able to use it from your _index.js_ file.
+- Created an `Arena` class containing the properties `monsters` (an array of `Monster` objects) and `hero` (a `Hero` object). For simplicity, we will assume that we necessarily have a single hero in an arena and one or more monsters.
+Also create a `constructor()` which will take a hero and an array of monsters as parameters. Also add a `size` property (integer with default value 10) which will indicate the size of the arena.
+Then don't forget to add it at the bottom of the *index.html* file with the other POO files
 
-After both objects have been instantiated, display the name and life 💙 (you should start at 100) of each of the two fighters to make sure everything is working fine. For now, you'll be using JS only in CLI mode.
-To do so, just type: `node index.js` in your terminal.
+- We want to position fighters in the arena: add the `x` and `y` properties in `Fighter` and modify `Monster` and `Hero`. This will allow you to give a position to the fighters (Remember to add the values ​​between 1 and 10 when instantiating them with `new`)
 
-## FIGHT !
+- In *index.js*, create an `Arena` type object by passing it `heracles` and the three `birds` that you will have put in an array.
 
-Heracles warmed up a bit, tightened his muscles, crushed some rocks with his bare hands. He's ready to do battle!
+- Now add this code under your `Arena` instantiation
+> const ArenaHTML = new ArenaTemplate('arena');
+ArenaHTML.createArena(<< My Arena instance >>);
 
-Create a `fight ()` method that will allow you to attack the enemy. To determine who you are going to attack, the `fight ()` method will take another Fighter object as a parameter! In the body of your method, you will first calculate the number of damage points of the attacker:
-
-- The fighter will hit with more or less success each time, the number of points of damage that the ** attacker ** does will therefore be a random number between 1 and the strength of the fighter (use `Math.random ()` ([Documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random), and if needed some advices from [this article](https://dev.to/rocambille/how-to-roll-a-dice-in-javascript-51j0))
-
-- But the attacked can defend and dodge! You will therefore mitigate the damage by subtracting the damage from the dexterity of the **attacked** (without **never going below zero**)
-
-- Once the damage is calculated, decrease the number of life points of the **attacked** by the value thus obtained. Be careful, the life of a fighter **cannot fall below zero**, also remember to check that
-
-In summary :
-
-```
-attacked's new life points = attacked's current life points - (attacker's damage - attacked's dexterity)
-```
-
-knowing that `(attacker's damage - attacked's dexterity)` must not be negative.
-
-There you go, your class is ready, you just have to use it!
-
-## 🗡️ There can be only one
-
-Heracles enters the cave, the lion is there, his red eyes pointed towards the intruder. The fight is imminent:
-
-1. In the _index.js_ file, create a loop for performing a fight to the death! As long as one of the two enemies has a health > 0, the combat therefore continues.
-
-2. In each "round" 🕛, Heracles attacks the lion, then the lion attacks Heracles. You have to display the round number, who attacks who, and the remaining life points.
-
-3. When one of the two is defeated, you must then display the winner 🏆 and the loser 💀. The screenshot below gives you a summary of what to expect.
-
-![instructions](instructions.png)
-
-🎁 BONUS: create a new `isAlive ()` method to help you optimize the code.
-
-## Conclusion
-
-Once you're done, feel free to tweak the code and add new features.
-You will be given a "clean" code at the start of the next workshop.
+- Update: you must see them on a map representing your arena and your fighters on it! Modify the coordinates of each one, they must move accordingly!
+ 
+The next step will be to attack the birds: this will be the second part of this workshop;)
